@@ -12,6 +12,7 @@ import openai
 #....
 from functions.database import store_messages,reset_messages
 from functions.openai_requests import convert_audio_to_text,get_chat_response
+from functions.text_to_speech import convert_text_to_speech
 
 
 openai.organization = config("OPEN_AI_ORG")
@@ -75,44 +76,39 @@ async def reset_conversation():
 #Get audio
 @app.get("/post-audio-get/")
 async def get_audio():
-    # get saved audio
-    audio_input = open("voice.mp3" ,'rb')
 
-    #decode audio
+    # Convert audio to text - production
+    # Save the file temporarily
+
+    audio_input = open("voice.mp3", "rb")
+
+    # Decode audio
     message_decoded = convert_audio_to_text(audio_input)
 
-    #store messages
-
-
-    print(message_decoded)
-
-    #Guard" Ensure message decoded
-
+    # Guard: Ensure output
     if not message_decoded:
-       return HTTPException(status_code=400,detail="failed to decode audio")
-    
-    #Get chatpt response
-    chat_reponse = get_chat_response(message_decoded)
+        raise HTTPException(status_code=400, detail="Failed to decode audio")
 
-    #store messages
+    # Get chat response
+    chat_response = get_chat_response(message_decoded)
 
-    store_messages(message_decoded,chat_reponse)
+    # Store messages
+    store_messages(message_decoded, chat_response)
 
+    # Guard: Ensure output
+    if not chat_response:
+        raise HTTPException(status_code=400, detail="Failed chat response")
 
-    print(chat_reponse)
-       
-    
-    return "done"
+    # Convert chat response to audio
+    audio_output = convert_text_to_speech(chat_response)
 
-# @app.post("/post-audio/")
-# async def post_audio(file:UploadFile = File(...)):
-#  print('hello')
+    # Guard: Ensure output
+    if not audio_output:
+        raise HTTPException(status_code=400, detail="Failed audio output")
 
+    # Create a generator that yields chunks of data
+    def iterfile():
+        yield audio_output
 
-
-
-# @app.get('/wealthy')
-# async def check_wealthy():
-#      return{"message":"wealthy"}
-
-
+    # Use for Post: Return output audio
+    return StreamingResponse(iterfile(), media_type="audio/mpeg")
