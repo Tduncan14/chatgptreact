@@ -10,7 +10,7 @@ import openai
 
 #custrom Functions import
 #....
-from functions.openai_requests import convert_audio_to_text
+from functions.openai_requests import convert_audio_to_text,get_chat_response
 
 
 openai.organization = config("OPEN_AI_ORG")
@@ -72,6 +72,16 @@ async def get_audio():
     message_decoded = convert_audio_to_text(audio_input)
 
     print(message_decoded)
+
+    #Guard" Ensure message decoded
+
+    if not message_decoded:
+       return HTTPException(status_code=400,detail="failed to decode audio")
+    
+    #Get chatpt response
+    chat_reponse = get_chat_response(message_decoded)
+    print(chat_reponse)
+       
     
     return "done"
 
