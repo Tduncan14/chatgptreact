@@ -10,6 +10,7 @@ import openai
 
 #custrom Functions import
 #....
+from functions.database import store_messages,reset_messages
 from functions.openai_requests import convert_audio_to_text,get_chat_response
 
 
@@ -58,6 +59,15 @@ async def check_health():
     return {"message": "healthy"}
 
 
+
+#reset messages
+@app.get("/reset")
+async def reset_conversation():
+    reset_messages()
+    return {"message": "conversation reset"}
+
+
+
 # post reponse
 # Not playing in browser when using post request return audio
 
@@ -71,6 +81,9 @@ async def get_audio():
     #decode audio
     message_decoded = convert_audio_to_text(audio_input)
 
+    #store messages
+
+
     print(message_decoded)
 
     #Guard" Ensure message decoded
@@ -80,6 +93,12 @@ async def get_audio():
     
     #Get chatpt response
     chat_reponse = get_chat_response(message_decoded)
+
+    #store messages
+
+    store_messages(message_decoded,chat_reponse)
+
+
     print(chat_reponse)
        
     
