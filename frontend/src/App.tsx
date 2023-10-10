@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import Controller from './components/controller'
+import Controller from './components/Controller'
 
 function App() {
 
 
   return (
 
-      <div className="App">
+      <div className="">
 
         <Controller />
       </div>
