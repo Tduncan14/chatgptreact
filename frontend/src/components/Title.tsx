@@ -19,9 +19,6 @@ function Title({setMessages}:Props){
     const resetConversation = async() => {
          setIsResetting(true)
 
-
-
-
          await axios.get("http://localhost:8000/reset").then((res) =>{
 
          if(res.status = 200){
@@ -43,7 +40,11 @@ function Title({setMessages}:Props){
          setIsResetting(false)
     }
 
-    return <div> This is me title</div>
+    return(
+        <div>
+            <button  onClick={resetConversation} className="bg-indigo-100 p-5">Push Me</button>
+        </div>
+    )
 }
 
 export default Title
