@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './App.css'
+import Controller from './components/controller'
 
 function App() {
 
@@ -7,9 +7,7 @@ function App() {
   return (
 
       <div className="App">
-          <div className='text-2xl font-bold'>
-            Hello
-          </div>
+        <Controller />
       </div>
   )
 }
